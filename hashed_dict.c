@@ -1,18 +1,12 @@
-#include <mem.h>
+#include <malloc.h>
+#include <string.h>
 
 struct nlist;
 struct hashtab;
 typedef unsigned char simple_byte;
 
-unsigned hash(void *key, size_t key_size, size_t hashtab_size);
+unsigned hash(void *key, struct hashtab* ht);
 void* void_dup(void* value, size_t size_bytes);
-void* void_dup(void* value, size_t size_bytes){
-	void *new;
-	if (new = malloc(size_bytes) == NULL){
-		return NULL;
-	}
-	return memcpy(new, value, size_bytes);
-}
 
 struct nlist { /* table entry: */
     struct nlist *next; /* next entry in chain */
@@ -25,9 +19,27 @@ struct hashtab {
 	size_t array_size;
 	size_t key_size;
 	size_t value_size;
-	char key_type[32];
-	char value_type[32];
+//	char key_type[32];
+//	char value_type[32];
 };
+
+struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size){
+	struct hashtab* new;
+	new = (struct hashtab*)malloc(sizeof(struct hashtab));
+	if (new == NULL || ((new->hash_array = (struct nlist**)malloc(sizeof(struct nlist*)*size)) == NULL)){
+		return NULL;
+	}
+	memset(new->hash_array, 0, sizeof(struct nlist*)*size);
+	new->array_size = size;
+	new->key_size = key_size;
+	new->value_size = value_size;
+	return new;
+}
+
+void delete_hashtab(struct hashtab* ht){
+	free(ht->hash_array);
+	free(ht);
+}
 
 /* hash: form hash value for string s */
 unsigned hash(void *key, struct hashtab* ht)
@@ -35,14 +47,14 @@ unsigned hash(void *key, struct hashtab* ht)
     unsigned hashval = 0;
 	register size_t i = ht->key_size;
     for (; i; --i){
-      hashval = *((simple_byte*)(key + key_size - 1u)) - + 31u * hashval;
+      hashval = *((simple_byte*)(key + ht->key_size - 1u)) - + 31u * hashval;
 	}
     return hashval % ht->array_size;
 }
 
 int key_cmp(void* key1, void* key2, size_t keysize){
 	for (; keysize; --keysize){
-		if (*((simple_byte*)(key1 + i - 1) != *((simple_byte*)(key2 + i -1)))){
+		if (*((simple_byte*)(key1 + keysize - 1)) != *((simple_byte*)(key2 + keysize -1))){
 			return 1;
 		}
 	}
@@ -72,9 +84,9 @@ void* void_dup(void* value, size_t size_bytes){
 struct nlist* setitem(void* key, void* value, struct hashtab* ht){
 	struct nlist *np;
 	unsigned hashval;
-	if (np = lookup(key, ht) == NULL){ // if not found
+	if ((np = lookup(key, ht)) == NULL){ // if not found
 		np = (struct nlist*)malloc(sizeof(struct nlist));
-		if (np == NULL || (np->key = void_dup(key)) == NULL){
+		if (np == NULL || ((np->key = void_dup(key, ht->key_size)) == NULL)){
 			return NULL;
 		}
 		hashval = hash(key,ht);
@@ -83,12 +95,14 @@ struct nlist* setitem(void* key, void* value, struct hashtab* ht){
 	}else{ // if found
 		free(np->val);
 	}
-	if (np->val = void_dup(value, ht->value_size) == NULL){
+	if ((np->val = void_dup(value, ht->value_size)) == NULL){
 		return NULL;
 	}
 	return np;
 
 }
+
+
 
 #if 0
 char *strdup(char *);
