@@ -19,11 +19,10 @@ struct hashtab {
 	size_t array_size;
 	size_t key_size;
 	size_t value_size;
-//	char key_type[32];
-//	char value_type[32];
+	int (*iseq)((void*, void*, size_t));
 };
 
-struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size){
+struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t)){
 	struct hashtab* new;
 	new = (struct hashtab*)malloc(sizeof(struct hashtab));
 	if (new == NULL || ((new->hash_array = (struct nlist**)malloc(sizeof(struct nlist*)*size)) == NULL)){
@@ -33,6 +32,7 @@ struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size){
 	new->array_size = size;
 	new->key_size = key_size;
 	new->value_size = value_size;
+	new->iseq = iseq;
 	return new;
 }
 
@@ -104,6 +104,28 @@ struct nlist* setitem(void* key, void* value, struct hashtab* ht){
 }
 
 
+/* group of is equal functions for fixed-width types, such as int, double, etc
+ * and variable-width string(array of chars)
+ * returns 0 in objects is equal, 1 otherwise
+ */
+int iseq_fixed(void* fst, void* snd, size_t size){
+	for(; size; --size){
+		if (*((simple_byte*)(fst + size - 1)) != *((simple_byte*)(snd + size - 1))){
+			return 1;
+		}	
+	}
+	return 0;
+}
+
+int iseq_string(void* fst, void* snd, size_t size){
+	char* char_fst = *(char**)fst;
+	char* char_snd = *(char**)snd;
+
+	return 0;
+}
+
+
+
 
 #if 0
 char *strdup(char *);
@@ -125,6 +147,7 @@ struct nlist *install(char *name, char *defn)
        return NULL;
     return np;
 }
+#endif
 
 char *strdup(char *s) /* make a duplicate of s */
 {
@@ -134,4 +157,3 @@ char *strdup(char *s) /* make a duplicate of s */
        strcpy(p, s);
     return p;
 }
-#endif
