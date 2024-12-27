@@ -8,9 +8,35 @@ struct nlist;
 struct hashtab;
 typedef unsigned char simple_byte;
 
-static unsigned hash(void *key, struct hashtab* ht);
-static void* void_dup(void* value, size_t size_bytes);
+/* funcs for manage hashtab:
+ * - create
+ * - delete
+ * - resize
+ */
+struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t));
+struct hashtab* resaize_hashtab(size_t new_size, struct hashtab* ht); // not implemented
+void delete_hashtab(struct hashtab* ht);
 
+/* funcs for manage hashtab elements
+ * - lookup - search element  - returns pointer to nlist or NULL
+ * - setitem - set new value in existing node or create new
+ */
+struct nlist* setitem(void* key, void* value, struct hashtab* ht);
+struct nlist* lookup(void *s, struct hashtab* ht);
+
+/* some iseq functions - for embedded types and strings
+ */
+int iseq_string(void* fst, void* snd, size_t size);
+int iseq_fixed(void* fst, void* snd, size_t size);
+
+/* common funcs for hastab - static only
+ */
+static unsigned hash(void *key, struct hashtab* ht);
+static void* void_dup(void* value, size_t size_bytes); /* make dumlicate of mem */
+static char *strdup(char *s); /* make a duplicate of s */
+
+/* structs implementations
+ * /
 struct nlist { /* table entry: */
     struct nlist *next; /* next entry in chain */
     void *key;
@@ -24,6 +50,8 @@ struct hashtab {
 	size_t value_size;
 	int (*iseq)((void*, void*, size_t));
 };
+
+/* end header */
 #endif //MY_OWN_HASHTAB_H
 
 struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t)){
@@ -52,33 +80,22 @@ unsigned hash(void *key, struct hashtab* ht)
 	size_t i = ht->key_size;
     for (; i; --i){
       hashval = *((simple_byte*)(key + i - 1u)) - + 31u * hashval;
-      //hashval = *((simple_byte*)(key + ht->key_size - 1u)) - + 31u * hashval;
 	}
     return hashval % ht->array_size;
 }
-
-int key_cmp(void* key1, void* key2, size_t keysize){
-	for (; keysize; --keysize){
-		if (*((simple_byte*)(key1 + keysize - 1)) != *((simple_byte*)(key2 + keysize -1))){
-			return 1;
-		}
-	}
-	return 0;
-}
-
 
 /* lookup: look for s in hashtab */
 struct nlist *lookup(void *s, struct hashtab* ht)
 {
     struct nlist *np;
     for (np = ht->hash_array[hash(s, ht)]; np != NULL; np = np->next)
-        if (!key_cmp(s, np->key, ht->key_size)){
+        if (!ht->iseq(s, np->key, ht->key_size)){
           return np; /* found */
 		}
     return NULL; /* not found */
 }
 
-void* void_dup(void* value, size_t size_bytes){
+static void* void_dup(void* value, size_t size_bytes){
 	void *new;
 	if ((new = malloc(size_bytes)) == NULL){
 		return NULL;
