@@ -1,3 +1,6 @@
+#ifndef MY_OWN_HASHTAB_H
+#define MY_OWN_HASHTAB_H
+
 #include <malloc.h>
 #include <string.h>
 
@@ -5,8 +8,8 @@ struct nlist;
 struct hashtab;
 typedef unsigned char simple_byte;
 
-unsigned hash(void *key, struct hashtab* ht);
-void* void_dup(void* value, size_t size_bytes);
+static unsigned hash(void *key, struct hashtab* ht);
+static void* void_dup(void* value, size_t size_bytes);
 
 struct nlist { /* table entry: */
     struct nlist *next; /* next entry in chain */
@@ -21,6 +24,7 @@ struct hashtab {
 	size_t value_size;
 	int (*iseq)((void*, void*, size_t));
 };
+#endif //MY_OWN_HASHTAB_H
 
 struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t)){
 	struct hashtab* new;
@@ -120,36 +124,15 @@ int iseq_fixed(void* fst, void* snd, size_t size){
 int iseq_string(void* fst, void* snd, size_t size){
 	char* char_fst = *(char**)fst;
 	char* char_snd = *(char**)snd;
-
+	while (*char_fst or *char_snd){
+		if (*char_fst != *char_snd){
+			return 1;
+		}
+	}
 	return 0;
 }
 
-
-
-
-#if 0
-char *strdup(char *);
-/* install: put (name, defn) in hashtab */
-struct nlist *install(char *name, char *defn)
-{
-    struct nlist *np;
-    unsigned hashval;
-    if ((np = lookup(name)) == NULL) { /* not found */
-        np = (struct nlist *) malloc(sizeof(*np));
-        if (np == NULL || (np->name = strdup(name)) == NULL)
-          return NULL;
-        hashval = hash(name);
-        np->next = hashtab[hashval];
-        hashtab[hashval] = np;
-    } else /* already there */
-        free((void *) np->defn); /*free previous defn */
-    if ((np->defn = strdup(defn)) == NULL)
-       return NULL;
-    return np;
-}
-#endif
-
-char *strdup(char *s) /* make a duplicate of s */
+static char *strdup(char *s) /* make a duplicate of s */
 {
     char *p;
     p = (char *) malloc(strlen(s)+1); /* +1 for ’\0’ */
