@@ -44,10 +44,11 @@ void delete_hashtab(struct hashtab* ht){
 /* hash: form hash value for string s */
 unsigned hash(void *key, struct hashtab* ht)
 {
-    unsigned hashval = 0;
-	register size_t i = ht->key_size;
+    register unsigned hashval = 0;
+	size_t i = ht->key_size;
     for (; i; --i){
-      hashval = *((simple_byte*)(key + ht->key_size - 1u)) - + 31u * hashval;
+      hashval = *((simple_byte*)(key + i - 1u)) - + 31u * hashval;
+      //hashval = *((simple_byte*)(key + ht->key_size - 1u)) - + 31u * hashval;
 	}
     return hashval % ht->array_size;
 }
