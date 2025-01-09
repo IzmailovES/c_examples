@@ -32,51 +32,52 @@
  *	- delete element function gets pointer for key and delete this entery in hashtab. return 0 if element was present, 1 otherwise 
  *
  */
-struct nlist;
-struct hashtab;
-typedef unsigned char simple_byte;
 
-/* funcs for manage hashtab:
- * - create
- * - delete
- * - resize
- */
-struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t));
-struct hashtab* resize_hashtab(size_t new_size, struct hashtab* ht); // not implemented
-void delete_hashtab(struct hashtab* ht);
+struct htd_nlist;
+struct htd_hashtab;
+struct htd_functions;
+typedef unsigned char htd_byte;
 
-/* funcs for manage hashtab elements
- * - lookup - search element  - returns pointer to nlist or NULL
- * - setitem - set new value in existing node or create new
- */
-struct nlist* setitem(void* key, void* value, struct hashtab* ht);
-struct nlist* lookup(void *s, struct hashtab* ht);
+/* funcs for manage hashtab: */
+struct hashtab*		htd_create_hashtab(size_t size, struct htd_functions* funcs);
+struct hashtab*		htd_resize_hashtab(struct htd_hashtab* ht, size_t new_size);
+void				htd_delete_hashtab(struct htd_hashtab* ht);
 
-/* some iseq functions - for embedded types and strings
- */
+/* funcs for manage hashtab elements */
+struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value);
+struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key);
+int					htd_delete(void* key);
+
+/* some iseq functions - for embedded types and strings */
 int iseq_string(void* fst, void* snd, size_t size);
 int iseq_fixed(void* fst, void* snd, size_t size);
 
-/* common funcs for hastab - static only
- */
-static unsigned hash(void *key, struct hashtab* ht);
-static void* void_dup(void* value, size_t size_bytes); /* make dumlicate of mem */
+/* common funcs for help you */
+static void* void_dup(void* value, size_t size_bytes); /* make duplicate of mem */
 static char *strdup(char *s); /* make a duplicate of s */
+size_t hash(void *key, size_t ht_size);
 
 /* structs implementations
  */
-struct nlist { /* table entry: */
-    struct nlist *next; /* next entry in chain */
+struct htd_nlist { /* table entry: */
+    struct htd_nlist *next; /* next entry in chain */
     void *key;
-    void *val; 
+    void *value; 
 };
 
-struct hashtab {
+struct htd_hashtab {
 	struct nlist** hash_array;
 	size_t array_size;
-	size_t key_size;
-	size_t value_size;
-	int (*iseq)((void*, void*, size_t));
+	struct htd_functions* funcs;
+};
+
+struct htd_functions{
+	size_t (*hash)(void*, size_t);
+	int (*is_equal)(void*, void*);
+	void* (*key_copy)(void*);
+	void (*key_destroy)(void*);
+	void* (*value_copy)(void*);
+	void (*value_destroy)(void*);
 };
 
 /* end header */
