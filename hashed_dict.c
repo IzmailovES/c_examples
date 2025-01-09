@@ -21,7 +21,15 @@
  *
  *	further feaches:
  *   - auto size control by usage level
- *	
+ *
+ * want to use:
+ *	- create struct with functions to use hashtab elements
+ *	- create hashtab whith: size_hashtab, struct with functions
+ *	- delete hashtab will remove all elements and free memory for keys and values, then free hastab memory
+ *	- resize hashtab will create new tab with new size and copy all elements with recalculate for new size
+ *	- lookup for element function gets pointer for reference value and seek it in tab. Returns pointer for struct nlist or NULL
+ *	- update element function gets pointer for key and value and create new item in hashtab with copy of key and value or updating exists value, return pointer for nlist
+ *	- delete element function gets pointer for key and delete this entery in hashtab. return 0 if element was present, 1 otherwise 
  *
  */
 struct nlist;
