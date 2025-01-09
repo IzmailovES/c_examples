@@ -1,22 +1,15 @@
 #include "htd.h"
 
-struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t)){
-	struct hashtab* new;
-	new = (struct hashtab*)malloc(sizeof(struct hashtab));
-	if (new == NULL || ((new->hash_array = (struct nlist**)malloc(sizeof(struct nlist*)*size)) == NULL)){
+struct htd_hashtab* htd_create_hashtab(size_t size, struct htd_functions* funcs){
+	struct hashtab* ht;
+	ht = (struct htd_hashtab*)malloc(sizeof(struct htd_hashtab));
+	if (ht == NULL || ((ht->hash_array = (struct htd_nlist**)malloc(sizeof(struct htd_nlist*)*size)) == NULL)){
 		return NULL;
 	}
-	memset(new->hash_array, 0, sizeof(struct nlist*)*size);
-	new->array_size = size;
-	new->key_size = key_size;
-	new->value_size = value_size;
-	new->iseq = iseq;
-	return new;
-}
-
-void delete_hashtab(struct hashtab* ht){
-	free(ht->hash_array);
-	free(ht);
+	memset(ht->hash_array, 0, sizeof(struct htd_nlist*)*size);
+	ht->array_size = size;
+	ht->functions = funcs;
+	return ht;
 }
 
 /* hash: form hash value for string s */

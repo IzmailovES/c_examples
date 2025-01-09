@@ -39,23 +39,23 @@ struct htd_functions;
 typedef unsigned char htd_byte;
 
 /* funcs for manage hashtab: */
-struct hashtab*		htd_create_hashtab(size_t size, struct htd_functions* funcs);
-struct hashtab*		htd_resize_hashtab(struct htd_hashtab* ht, size_t new_size);
-void				htd_delete_hashtab(struct htd_hashtab* ht);
+struct htd_hashtab*		htd_create_hashtab(size_t size, struct htd_functions* funcs); //vrode_gotovo
+struct htd_hashtab*		htd_resize_hashtab(struct htd_hashtab* ht, size_t new_size); //not implemented
+void					htd_delete_hashtab(struct htd_hashtab* ht); //not implemented
 
 /* funcs for manage hashtab elements */
-struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value);
-struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key);
-int					htd_delete(void* key);
+struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //TODO
+struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key); //TODO
+int					htd_delete(struct htd_hashtab* ht, void* key); // not implemented
 
 /* some iseq functions - for embedded types and strings */
-int iseq_string(void* fst, void* snd, size_t size);
-int iseq_fixed(void* fst, void* snd, size_t size);
+int iseq_string(void* fst, void* snd, size_t size); //TODO
+int iseq_fixed(void* fst, void* snd, size_t size); //TODO
 
 /* common funcs for help you */
-static void* void_dup(void* value, size_t size_bytes); /* make duplicate of mem */
-static char *strdup(char *s); /* make a duplicate of s */
-size_t hash(void *key, size_t ht_size);
+static void* void_dup(void* value, size_t size_bytes); /* make duplicate of mem */ //TODO
+static char *strdup(char *s); /* make a duplicate of s */ //TODO
+size_t hash(void *key, size_t ht_size); //TODO
 
 /* structs implementations
  */
@@ -68,7 +68,7 @@ struct htd_nlist { /* table entry: */
 struct htd_hashtab {
 	struct nlist** hash_array;
 	size_t array_size;
-	struct htd_functions* funcs;
+	struct htd_functions* functions;
 };
 
 struct htd_functions{
