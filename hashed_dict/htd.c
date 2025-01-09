@@ -24,11 +24,11 @@ unsigned hash(void *key, struct hashtab* ht)
 }
 
 /* lookup: look for s in hashtab */
-struct nlist *lookup(void *s, struct hashtab* ht)
+struct htd_nlist* lookup(struct htd_hashtab* ht, void* key)
 {
-    struct nlist *np;
-    for (np = ht->hash_array[hash(s, ht)]; np != NULL; np = np->next)
-        if (!ht->iseq(s, np->key, ht->key_size)){
+    struct htd_nlist* np; //node pointer
+    for (np = ht->hash_array[ht->functions->hash(key, ht->array_size)]; np != NULL; np = np->next)
+        if (!ht->functions->is_equal(key, np->key)){
           return np; /* found */
 		}
     return NULL; /* not found */

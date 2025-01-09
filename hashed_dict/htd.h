@@ -45,7 +45,7 @@ void					htd_delete_hashtab(struct htd_hashtab* ht); //not implemented
 
 /* funcs for manage hashtab elements */
 struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //TODO
-struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key); //TODO
+struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key); //vrode_gotovo
 int					htd_delete(struct htd_hashtab* ht, void* key); // not implemented
 
 /* some iseq functions - for embedded types and strings */
