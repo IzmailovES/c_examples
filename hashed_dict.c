@@ -3,7 +3,27 @@
 
 #include <malloc.h>
 #include <string.h>
-
+/* main functions:
+ * create hashtab with determine types of keys and values
+ * must to determine:
+ *	- key hash function
+ *	- key is_equal function
+ *	- key copy and destroy functions
+ *	- value copy and destroy functions
+ *
+ * feaches:
+ * - create hashtab
+ * - update element
+ * - delete element
+ * - lookup for element in hashtab
+ * - resize hashtab
+ * - delete hashtab
+ *
+ *	further feaches:
+ *   - auto size control by usage level
+ *	
+ *
+ */
 struct nlist;
 struct hashtab;
 typedef unsigned char simple_byte;
@@ -14,7 +34,7 @@ typedef unsigned char simple_byte;
  * - resize
  */
 struct hashtab* create_hashtab(size_t size, size_t key_size, size_t value_size, int (*iseq)(void*, void*, size_t));
-struct hashtab* resaize_hashtab(size_t new_size, struct hashtab* ht); // not implemented
+struct hashtab* resize_hashtab(size_t new_size, struct hashtab* ht); // not implemented
 void delete_hashtab(struct hashtab* ht);
 
 /* funcs for manage hashtab elements
@@ -36,7 +56,7 @@ static void* void_dup(void* value, size_t size_bytes); /* make dumlicate of mem 
 static char *strdup(char *s); /* make a duplicate of s */
 
 /* structs implementations
- * /
+ */
 struct nlist { /* table entry: */
     struct nlist *next; /* next entry in chain */
     void *key;
