@@ -54,7 +54,7 @@ int iseq_fixed(void* fst, void* snd, size_t size); //TODO
 
 /* common funcs for help you */
 static void* void_dup(void* value, size_t size_bytes); /* make duplicate of mem */ //TODO
-static char *strdup(char *s); /* make a duplicate of s */ //TODO
+//static char *strdup(char *s); /* make a duplicate of s */ //TODO
 size_t hash(void *key, size_t ht_size); //TODO
 
 /* structs implementations
@@ -66,7 +66,7 @@ struct htd_nlist { /* table entry: */
 };
 
 struct htd_hashtab {
-	struct nlist** hash_array;
+	struct htd_nlist** hash_array;
 	size_t array_size;
 	struct htd_functions* functions;
 };

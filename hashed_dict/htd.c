@@ -1,7 +1,7 @@
 #include "htd.h"
 
 struct htd_hashtab* htd_create_hashtab(size_t size, struct htd_functions* funcs){
-	struct hashtab* ht;
+	struct htd_hashtab* ht;
 	ht = (struct htd_hashtab*)malloc(sizeof(struct htd_hashtab));
 	if (ht == NULL || ((ht->hash_array = (struct htd_nlist**)malloc(sizeof(struct htd_nlist*)*size)) == NULL)){
 		return NULL;
@@ -12,6 +12,70 @@ struct htd_hashtab* htd_create_hashtab(size_t size, struct htd_functions* funcs)
 	return ht;
 }
 
+/* lookup: look for s in hashtab */
+struct htd_nlist* htd_lookup(struct htd_hashtab* ht, void* key)
+{
+    struct htd_nlist* np; //node pointer
+    for (np = ht->hash_array[ht->functions->hash(key, ht->array_size)]; np != NULL; np = np->next)
+        if (!ht->functions->is_equal(key, np->key)){
+          return np; /* found */
+		}
+    return NULL; /* not found */
+}
+
+struct htd_nlist* htd_update(struct htd_hashtab* ht, void* key, void* value){
+	struct htd_nlist *np; // node pointer
+	size_t hashval;
+	if ((np = htd_lookup(ht, key)) == NULL){ // if not found
+		np = (struct htd_nlist*)malloc(sizeof(struct htd_nlist));
+		if (np == NULL || ((np->key = ht->functions->key_copy(key)) == NULL)){
+			return NULL;
+		}
+		hashval = ht->functions->hash(key, ht->array_size);
+		np->next = ht->hash_array[hashval];
+		ht->hash_array[hashval] = np;
+	}else{ // if found
+		ht->functions->value_destroy(np->value);
+	}
+	if ((np->value = ht->functions->value_copy(value)) == NULL){
+		return NULL;
+	}
+	return np;
+}
+
+
+#if 0
+/* group of is equal functions for fixed-width types, such as int, double, etc
+ * and variable-width string(array of chars)
+ * returns 0 in objects is equal, 1 otherwise
+ */
+int iseq_fixed(void* fst, void* snd, size_t size){
+	for(; size; --size){
+		if (*((simple_byte*)(fst + size - 1)) != *((simple_byte*)(snd + size - 1))){
+			return 1;
+		}	
+	}
+	return 0;
+}
+
+int iseq_string(void* fst, void* snd, size_t size){
+	char* char_fst = *(char**)fst;
+	char* char_snd = *(char**)snd;
+	while (*char_fst or *char_snd){
+		if (*char_fst != *char_snd){
+			return 1;
+		}
+	}
+	return 0;
+}
+static char *strdup(char *s) /* make a duplicate of s */
+{
+    char *p;
+    p = (char *) malloc(strlen(s)+1); /* +1 for ’\0’ */
+    if (p != NULL)
+       strcpy(p, s);
+    return p;
+}
 /* hash: form hash value for string s */
 unsigned hash(void *key, struct hashtab* ht)
 {
@@ -21,17 +85,6 @@ unsigned hash(void *key, struct hashtab* ht)
       hashval = *((simple_byte*)(key + i - 1u)) - + 31u * hashval;
 	}
     return hashval % ht->array_size;
-}
-
-/* lookup: look for s in hashtab */
-struct htd_nlist* lookup(struct htd_hashtab* ht, void* key)
-{
-    struct htd_nlist* np; //node pointer
-    for (np = ht->hash_array[ht->functions->hash(key, ht->array_size)]; np != NULL; np = np->next)
-        if (!ht->functions->is_equal(key, np->key)){
-          return np; /* found */
-		}
-    return NULL; /* not found */
 }
 
 static void* void_dup(void* value, size_t size_bytes){
@@ -62,37 +115,4 @@ struct nlist* setitem(void* key, void* value, struct hashtab* ht){
 	return np;
 
 }
-
-
-/* group of is equal functions for fixed-width types, such as int, double, etc
- * and variable-width string(array of chars)
- * returns 0 in objects is equal, 1 otherwise
- */
-int iseq_fixed(void* fst, void* snd, size_t size){
-	for(; size; --size){
-		if (*((simple_byte*)(fst + size - 1)) != *((simple_byte*)(snd + size - 1))){
-			return 1;
-		}	
-	}
-	return 0;
-}
-
-int iseq_string(void* fst, void* snd, size_t size){
-	char* char_fst = *(char**)fst;
-	char* char_snd = *(char**)snd;
-	while (*char_fst or *char_snd){
-		if (*char_fst != *char_snd){
-			return 1;
-		}
-	}
-	return 0;
-}
-
-static char *strdup(char *s) /* make a duplicate of s */
-{
-    char *p;
-    p = (char *) malloc(strlen(s)+1); /* +1 for ’\0’ */
-    if (p != NULL)
-       strcpy(p, s);
-    return p;
-}
+#endif
