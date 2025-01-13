@@ -41,7 +41,8 @@ typedef unsigned char htd_byte;
 /* funcs for manage hashtab: */
 struct htd_hashtab*		htd_create_hashtab(size_t size, struct htd_functions* funcs); //vrode_gotovo
 struct htd_hashtab*		htd_resize_hashtab(struct htd_hashtab* ht, size_t new_size); //not implemented
-void					htd_delete_hashtab(struct htd_hashtab* ht); //not implemented
+size_t					htd_delete_hashtab(struct htd_hashtab** ht); // vrode cotovo
+size_t					htd_clean_hashtab(struct htd_hashtab* ht); //vrode gotovo
 
 /* funcs for manage hashtab elements */
 struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //vrode gotovo
@@ -92,6 +93,7 @@ struct htd_functions{
 		typeof(value) _value = (value); \
 		htd_update((ht), &_key, &_value); })
 	
+
 /* end header */
 #endif //MY_OWN_HASHTAB_H
 

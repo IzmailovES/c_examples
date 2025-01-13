@@ -42,7 +42,9 @@ int main(){
 	printf("update_done %d\n", *(int*)np->value);
 	printf("%d\n", *(int*)htd_lookup(ht, &key)->value);
 	printf("%d\n",  *(int*)htd_lookup_nop(ht, key)->value);
+	printf("cleaned: %lu\n", htd_clean_hashtab(ht));
 	k = htd_delete(ht, &key);
 	printf("%d %lx\n", k, (unsigned long)htd_lookup(ht, &key));
 	printf("%lx\n",  (unsigned long)htd_lookup_nop(ht, 5151));
+	printf("deleted: %lu\n", htd_delete_hashtab(&ht));
 }

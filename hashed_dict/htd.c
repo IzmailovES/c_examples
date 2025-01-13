@@ -66,6 +66,31 @@ int htd_delete(struct htd_hashtab* ht, void* key){
 	return 1;
 }
 
+size_t htd_clean_hashtab(struct htd_hashtab* ht){
+	size_t deleted = 0;
+	size_t i;
+	struct htd_nlist* np;
+
+	for (i=0; i != ht->array_size; ++i){
+		while (np = ht->hash_array[i]){
+			ht->hash_array[i] = np->next;
+			ht->functions->value_destroy(np->value);
+			ht->functions->key_destroy(np->key);
+			free(np);
+			++deleted;
+		}
+	}
+	return deleted;
+}
+
+size_t htd_delete_hashtab(struct htd_hashtab** ht){
+	size_t deleted = htd_clean_hashtab(*ht);
+	free((*ht)->hash_array);
+	free(*ht);
+	*ht = NULL;
+	return deleted;
+}
+
 #if 0
 /* group of is equal functions for fixed-width types, such as int, double, etc
  * and variable-width string(array of chars)
