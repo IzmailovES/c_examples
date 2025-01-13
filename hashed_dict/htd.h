@@ -44,9 +44,9 @@ struct htd_hashtab*		htd_resize_hashtab(struct htd_hashtab* ht, size_t new_size)
 void					htd_delete_hashtab(struct htd_hashtab* ht); //not implemented
 
 /* funcs for manage hashtab elements */
-struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //TODO
+struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //vrode gotovo
 struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key); //vrode_gotovo
-int					htd_delete(struct htd_hashtab* ht, void* key); // not implemented
+int					htd_delete(struct htd_hashtab* ht, void* key); // vrode work
 
 /* some iseq functions - for embedded types and strings */
 int iseq_string(void* fst, void* snd, size_t size); //TODO
@@ -80,6 +80,18 @@ struct htd_functions{
 	void (*value_destroy)(void*);
 };
 
+/* some macros for good work
+ * nopointer usage
+ */
+#define htd_lookup_nop(ht, key) ({ \
+		typeof(key) _key = (key); \
+		htd_lookup((ht), &(_key));})
+
+#define htd_update_nop(ht, key, value) ({ \
+		typeof(key) _key = (key); \
+		typeof(value) _value = (value); \
+		htd_update((ht), &_key, &_value); })
+	
 /* end header */
 #endif //MY_OWN_HASHTAB_H
 

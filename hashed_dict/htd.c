@@ -43,6 +43,28 @@ struct htd_nlist* htd_update(struct htd_hashtab* ht, void* key, void* value){
 	return np;
 }
 
+int htd_delete(struct htd_hashtab* ht, void* key){
+	struct htd_nlist* np, *npp;
+	size_t hashval;
+	if ((np = htd_lookup(ht,key)) == NULL){ // if not exists
+		return 0;
+	}
+
+	ht->functions->value_destroy(np->value);
+	ht->functions->key_destroy(np->key);
+
+	hashval = ht->functions->hash(key, ht->array_size);
+	//search for pointer to np
+	if ((npp = ht->hash_array[hashval]) == np){ //if our np is the first item
+		ht->hash_array[hashval] = ht->hash_array[hashval]->next;
+		free(np);
+	}else{
+		for (;npp->next != np; npp = npp->next);
+		npp->next = np->next;
+		free(np);
+	}
+	return 1;
+}
 
 #if 0
 /* group of is equal functions for fixed-width types, such as int, double, etc

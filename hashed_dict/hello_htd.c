@@ -20,6 +20,7 @@ void int_key_destroy(void* key){
 
 
 int main(){
+	int k;
 	struct htd_functions ht_int_int_funcs = {
 		.hash = int_hash,
 		.is_equal = int_int_is_equal,
@@ -36,10 +37,12 @@ int main(){
 		printf("ht spzdan %zu\n", ht->array_size);
 	}
 	int key = 42;
-	int value = 443;
 	struct htd_nlist* np;
-	np = htd_update(ht, &key, &value);
+	np = htd_update_nop(ht, 21+21, 444-1);
 	printf("update_done %d\n", *(int*)np->value);
 	printf("%d\n", *(int*)htd_lookup(ht, &key)->value);
-
+	printf("%d\n",  *(int*)htd_lookup_nop(ht, key)->value);
+	k = htd_delete(ht, &key);
+	printf("%d %lx\n", k, (unsigned long)htd_lookup(ht, &key));
+	printf("%lx\n",  (unsigned long)htd_lookup_nop(ht, 5151));
 }
