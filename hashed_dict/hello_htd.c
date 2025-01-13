@@ -5,7 +5,7 @@ size_t int_hash(void* key, size_t sz){
 }
 
 int int_int_is_equal(void* fst, void* snd){
-	return !(*(int*)fst == *(int*)snd);
+	return *(int*)fst == *(int*)snd;
 }
 
 void* int_key_copy(void* src){

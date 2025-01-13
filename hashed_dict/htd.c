@@ -17,7 +17,7 @@ struct htd_nlist* htd_lookup(struct htd_hashtab* ht, void* key)
 {
     struct htd_nlist* np; //node pointer
     for (np = ht->hash_array[ht->functions->hash(key, ht->array_size)]; np != NULL; np = np->next)
-        if (!ht->functions->is_equal(key, np->key)){
+        if (ht->functions->is_equal(key, np->key)){
           return np; /* found */
 		}
     return NULL; /* not found */
@@ -31,7 +31,7 @@ struct htd_nlist* htd_update(struct htd_hashtab* ht, void* key, void* value){
 		if (np == NULL || ((np->key = ht->functions->key_copy(key)) == NULL)){
 			return NULL;
 		}
-		hashval = ht->functions->hash(key, ht->array_size);
+		hashval = ht->functions->hash(key, ht->array_size); //maybe double hash calculate
 		np->next = ht->hash_array[hashval];
 		ht->hash_array[hashval] = np;
 	}else{ // if found
