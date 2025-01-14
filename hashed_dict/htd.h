@@ -48,6 +48,7 @@ size_t					htd_clean_hashtab(struct htd_hashtab* ht); //vrode gotovo
 struct htd_nlist*	htd_update(struct htd_hashtab* ht, void* key, void* value); //vrode gotovo
 struct htd_nlist*	htd_lookup(struct htd_hashtab* ht, void* key); //vrode_gotovo
 int					htd_delete(struct htd_hashtab* ht, void* key); // vrode work
+struct htd_nlist    htd_change(struct htd_hashtab* ht, void* key, void* (*func)(void*), void* default_value); //TODO
 
 /* some iseq functions - for embedded types and strings */
 int iseq_string(void* fst, void* snd, size_t size); //TODO
