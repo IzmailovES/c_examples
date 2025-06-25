@@ -9,6 +9,7 @@ struct htd_hashtab* htd_create_hashtab(size_t size, struct htd_functions* funcs)
 	memset(ht->hash_array, 0, sizeof(struct htd_nlist*)*size);
 	ht->array_size = size;
 	ht->functions = funcs;
+	ht->_auto_functions = 0;
 	return ht;
 }
 
@@ -86,6 +87,7 @@ size_t htd_clean_hashtab(struct htd_hashtab* ht){
 size_t htd_delete_hashtab(struct htd_hashtab** ht){
 	size_t deleted = htd_clean_hashtab(*ht);
 	free((*ht)->hash_array);
+	if ((*ht)->_auto_functions) { free((*ht)->functions); }
 	free(*ht);
 	*ht = NULL;
 	return deleted;

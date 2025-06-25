@@ -71,6 +71,7 @@ struct htd_hashtab {
 	struct htd_nlist** hash_array;
 	size_t array_size;
 	struct htd_functions* functions;
+	int _auto_functions;
 };
 
 struct htd_functions{
@@ -93,7 +94,31 @@ struct htd_functions{
 		typeof(key) _key = (key); \
 		typeof(value) _value = (value); \
 		htd_update((ht), &_key, &_value); })
-	
+
+// funcs for auto-configure hashtab with buid-in types
+
+#define htdfs_is_equal(obj_t) ({ \
+	!memcpy()
+})
+
+#define htd_create_builtins(size, key_t, value_t, htd) ({ \
+		struct htd_functions* ht_f = (struct htd_functions*)malloc(sizeof(struct htd_functoins)); \
+		if (ht_f){	\
+			ht_f->hash = htdfs_hash##key_t ; \
+			ht_f->is_equal = htdfs_is_equal_##key_t ; \
+			ht_f->key_copy = htdfs_copy##key_t ; \
+			ht_f->key_destroy = htdfs_destroy##key_t ; \
+			ht_f->value_copy = htdfs_copy##key_t ; \
+			ht_f->value_destroy = htdfs_destroy##key_t ; \
+			htd = htd_create_hashtab(size, ht_f); \
+			if (htd){ htd->_auto_functions = 1;}	\
+		}else{ \
+			htd = NULL; \
+		} \
+})
+
+
+
 
 /* end header */
 #endif //MY_OWN_HASHTAB_H
